@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { Menu, X, ShoppingBag } from 'lucide-react';
+import { Menu, X, ShoppingBag, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,6 +37,15 @@ const Navbar = () => {
                 <span className="text-xs text-gray-500 group-hover:text-green-500">{item.nameAr}</span>
               </a>
             ))}
+            
+            {/* Admin Link */}
+            <Link
+              to="/admin"
+              className="flex items-center text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+            >
+              <Settings className="w-4 h-4 mr-1" />
+              Admin
+            </Link>
             
             {/* Language Switcher */}
             <div className="flex items-center bg-amber-100 rounded-full p-1">
@@ -74,6 +84,14 @@ const Navbar = () => {
                   <span className="text-xs text-gray-500">{item.nameAr}</span>
                 </a>
               ))}
+              <Link
+                to="/admin"
+                className="flex items-center px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-amber-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Admin
+              </Link>
             </div>
           </div>
         )}
