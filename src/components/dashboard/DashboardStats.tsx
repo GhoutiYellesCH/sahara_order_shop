@@ -1,35 +1,27 @@
 
 import React from 'react';
 import { Package, Users, DollarSign, TrendingUp } from 'lucide-react';
+import { useData } from '../../contexts/DataContext';
 
 const DashboardStats = () => {
-  // Mock data with costs and profits
-  const mockOrders = [
-    { product: 'Théière Traditionnelle Kabyle', price: 2500, cost: 1800, customer: 'Ahmed Benali' },
-    { product: 'Panier Artisanal Berbère', price: 1800, cost: 1200, customer: 'Fatima Khelifi' },
-    { product: 'Tapis Ghardaïa Authentique', price: 4200, cost: 3000, customer: 'Yacine Mourad' },
-    { product: 'Théière Traditionnelle Kabyle', price: 2500, cost: 1800, customer: 'Amina Sedki' },
-    { product: 'Panier Artisanal Berbère', price: 1800, cost: 1200, customer: 'Mohamed Larbi' }
-  ];
+  const { orders, customers } = useData();
 
-  const totalRevenue = mockOrders.reduce((sum, order) => sum + order.price, 0);
-  const totalCosts = mockOrders.reduce((sum, order) => sum + order.cost, 0);
+  const totalRevenue = orders.reduce((sum, order) => sum + order.price, 0);
+  const totalCosts = orders.reduce((sum, order) => sum + order.cost, 0);
   const totalProfit = totalRevenue - totalCosts;
-  const profitMargin = ((totalProfit / totalRevenue) * 100).toFixed(1);
-
-  const uniqueCustomers = [...new Set(mockOrders.map(order => order.customer))].length;
+  const profitMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : '0';
 
   const stats = [
     {
       name: 'Total Commandes',
-      value: mockOrders.length.toString(),
+      value: orders.length.toString(),
       change: '+2 cette semaine',
       changeType: 'positive',
       icon: Package,
     },
     {
       name: 'Clients Uniques',
-      value: uniqueCustomers.toString(),
+      value: customers.length.toString(),
       change: '+3 cette semaine',
       changeType: 'positive',
       icon: Users,

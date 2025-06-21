@@ -1,68 +1,64 @@
 
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus, Edit, Trash2, Package } from 'lucide-react';
+import { useData } from '../../contexts/DataContext';
 
 const ProductManagement = () => {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'Théière Traditionnelle Kabyle',
-      price: 2500,
-      cost: 1800,
-      stock: 15,
-      description: 'Théière artisanale en argile de Kabylie'
-    },
-    {
-      id: 2,
-      name: 'Panier Artisanal Berbère',
-      price: 1800,
-      cost: 1200,
-      stock: 8,
-      description: 'Panier tressé à la main par des artisans berbères'
-    },
-    {
-      id: 3,
-      name: 'Tapis Ghardaïa Authentique',
-      price: 4200,
-      cost: 3000,
-      stock: 5,
-      description: 'Tapis traditionnel de Ghardaïa aux motifs authentiques'
-    }
-  ]);
-
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newProduct, setNewProduct] = useState({
+  const { products, addProduct, updateProduct, deleteProduct } = useData();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
     name: '',
-    price: '',
-    cost: '',
-    stock: '',
+    price: 0,
+    cost: 0,
+    stock: 0,
+    category: '',
     description: ''
   });
 
-  const handleAddProduct = () => {
-    if (newProduct.name && newProduct.price && newProduct.cost) {
-      const product = {
-        id: products.length + 1,
-        name: newProduct.name,
-        price: parseInt(newProduct.price),
-        cost: parseInt(newProduct.cost),
-        stock: parseInt(newProduct.stock) || 0,
-        description: newProduct.description
-      };
-      setProducts([...products, product]);
-      setNewProduct({ name: '', price: '', cost: '', stock: '', description: '' });
-      setIsAddDialogOpen(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingProduct) {
+      updateProduct(editingProduct, {
+        ...formData,
+        id: editingProduct,
+        image: '/placeholder.svg'
+      });
+      setEditingProduct(null);
+    } else {
+      addProduct({
+        ...formData,
+        id: Date.now().toString(),
+        image: '/placeholder.svg'
+      });
+    }
+    setFormData({ name: '', price: 0, cost: 0, stock: 0, category: '', description: '' });
+    setShowAddForm(false);
+  };
+
+  const handleEdit = (product: any) => {
+    setFormData({
+      name: product.name,
+      price: product.price,
+      cost: product.cost,
+      stock: product.stock,
+      category: product.category,
+      description: product.description
+    });
+    setEditingProduct(product.id);
+    setShowAddForm(true);
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+      deleteProduct(id);
     }
   };
 
-  const handleDeleteProduct = (id: number) => {
-    setProducts(products.filter(product => product.id !== id));
-  };
-
-  const getMargin = (price: number, cost: number) => {
-    return (((price - cost) / price) * 100).toFixed(1);
+  const resetForm = () => {
+    setFormData({ name: '', price: 0, cost: 0, stock: 0, category: '', description: '' });
+    setEditingProduct(null);
+    setShowAddForm(false);
   };
 
   return (
@@ -70,154 +66,186 @@ const ProductManagement = () => {
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium text-gray-900">Gestion des Produits</h3>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <button className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Ajouter Produit
-              </button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Ajouter un Nouveau Produit</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nom du Produit
-                  </label>
-                  <input
-                    type="text"
-                    value={newProduct.name}
-                    onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Nom du produit"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Prix de Vente (DA)
-                    </label>
-                    <input
-                      type="number"
-                      value={newProduct.price}
-                      onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="2500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Coût d'Achat (DA)
-                    </label>
-                    <input
-                      type="number"
-                      value={newProduct.cost}
-                      onChange={(e) => setNewProduct({...newProduct, cost: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="1800"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Stock
-                  </label>
-                  <input
-                    type="number"
-                    value={newProduct.stock}
-                    onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="10"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    value={newProduct.description}
-                    onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    rows={3}
-                    placeholder="Description du produit"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    onClick={() => setIsAddDialogOpen(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    onClick={handleAddProduct}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                  >
-                    Ajouter
-                  </button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Ajouter Produit
+          </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Produit</TableHead>
-              <TableHead>Prix de Vente</TableHead>
-              <TableHead>Coût d'Achat</TableHead>
-              <TableHead>Marge</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{product.name}</div>
-                    <div className="text-sm text-gray-500">{product.description}</div>
+      {showAddForm && (
+        <div className="p-6 border-b bg-gray-50">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nom du Produit
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Catégorie
+                </label>
+                <select
+                  required
+                  value={formData.category}
+                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Sélectionner une catégorie</option>
+                  <option value="Céramique">Céramique</option>
+                  <option value="Textile">Textile</option>
+                  <option value="Vannerie">Vannerie</option>
+                  <option value="Bijoux">Bijoux</option>
+                  <option value="Décoration">Décoration</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Prix de Vente (DA)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Coût d'Achat (DA)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={formData.cost}
+                  onChange={(e) => setFormData({...formData, cost: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Stock
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({...formData, stock: parseInt(e.target.value)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                type="submit"
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              >
+                {editingProduct ? 'Modifier' : 'Ajouter'}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+              >
+                Annuler
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {products.map((product) => {
+            const profit = product.price - product.cost;
+            const profitMargin = ((profit / product.price) * 100).toFixed(1);
+            
+            return (
+              <div key={product.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                      <Package className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 text-sm">{product.name}</h4>
+                      <p className="text-xs text-gray-500">{product.category}</p>
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell className="font-semibold">{product.price.toLocaleString()} DA</TableCell>
-                <TableCell>{product.cost.toLocaleString()} DA</TableCell>
-                <TableCell>
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    {getMargin(product.price, product.cost)}%
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    product.stock > 5 ? 'bg-green-100 text-green-800' : 
-                    product.stock > 0 ? 'bg-yellow-100 text-yellow-800' : 
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {product.stock}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <button className="text-green-600 hover:text-green-800">
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button 
-                      onClick={() => handleDeleteProduct(product.id)}
+                    <button
+                      onClick={() => handleDelete(product.id)}
                       className="text-red-600 hover:text-red-800"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Prix:</span>
+                    <span className="font-semibold">{product.price.toLocaleString()} DA</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Coût:</span>
+                    <span className="text-red-600">{product.cost.toLocaleString()} DA</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Bénéfice:</span>
+                    <span className="text-green-600 font-semibold">
+                      +{profit.toLocaleString()} DA ({profitMargin}%)
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Stock:</span>
+                    <span className={`font-semibold ${product.stock < 5 ? 'text-red-600' : 'text-green-600'}`}>
+                      {product.stock}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

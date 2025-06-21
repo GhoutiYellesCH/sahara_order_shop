@@ -3,7 +3,9 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import ProductShowcase from '../components/ProductShowcase';
+import About from '../components/About';
 import OrderForm from '../components/OrderForm';
+import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 
 const Index = () => {
@@ -12,7 +14,9 @@ const Index = () => {
       <Navbar />
       <Hero />
       <ProductShowcase />
+      <About />
       <OrderForm />
+      <Contact />
       <Footer />
     </div>
   );
