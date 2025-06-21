@@ -112,3 +112,32 @@ export function sanitizeOrderInput(data: any) {
     product: data.product?.trim()
   };
 }
+
+/**
+ * Simulates order processing for frontend demo
+ * This will be replaced with actual API calls when backend is connected
+ */
+export function processOrder(orderData: OrderValidationInput): Promise<{ success: boolean; orderId?: string; message: string }> {
+  return new Promise((resolve) => {
+    // Simulate API delay
+    setTimeout(() => {
+      const orderId = generateOrderId();
+      
+      console.log('=== ORDER SIMULATION ===');
+      console.log('Order ID:', orderId);
+      console.log('Customer:', orderData.name);
+      console.log('Product:', orderData.product);
+      console.log('Wilaya:', orderData.wilaya);
+      console.log('Phone:', orderData.phone);
+      console.log('Address:', orderData.address);
+      console.log('Status: Pending (Cash on Delivery)');
+      console.log('=======================');
+      
+      resolve({
+        success: true,
+        orderId: orderId,
+        message: 'Commande créée avec succès! Vous serez contacté pour la livraison.'
+      });
+    }, 1000);
+  });
+}
