@@ -20,7 +20,9 @@ const OrdersTable = () => {
       phone: '0551234567',
       status: 'pending',
       date: '2024-12-24',
-      total: '2500 DA'
+      price: 2500,
+      cost: 1800,
+      profit: 700
     },
     {
       id: 'DZ-1735069272-X9Y2Z1',
@@ -30,7 +32,9 @@ const OrdersTable = () => {
       phone: '0661234567',
       status: 'confirmed',
       date: '2024-12-23',
-      total: '1800 DA'
+      price: 1800,
+      cost: 1200,
+      profit: 600
     },
     {
       id: 'DZ-1735069273-M5N8P2',
@@ -40,7 +44,9 @@ const OrdersTable = () => {
       phone: '0771234567',
       status: 'delivered',
       date: '2024-12-22',
-      total: '4200 DA'
+      price: 4200,
+      cost: 3000,
+      profit: 1200
     }
   ]);
 
@@ -88,10 +94,11 @@ const OrdersTable = () => {
               <TableHead>Client</TableHead>
               <TableHead>Produit</TableHead>
               <TableHead>Wilaya</TableHead>
-              <TableHead>Téléphone</TableHead>
+              <TableHead>Prix</TableHead>
+              <TableHead>Coût</TableHead>
+              <TableHead>Bénéfice</TableHead>
               <TableHead>Statut</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Total</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,10 +109,13 @@ const OrdersTable = () => {
                 <TableCell className="font-medium">{order.customer}</TableCell>
                 <TableCell>{order.product}</TableCell>
                 <TableCell>{order.wilaya}</TableCell>
-                <TableCell>{order.phone}</TableCell>
+                <TableCell className="font-semibold">{order.price.toLocaleString()} DA</TableCell>
+                <TableCell className="text-red-600">{order.cost.toLocaleString()} DA</TableCell>
+                <TableCell className="font-semibold text-green-600">
+                  +{order.profit.toLocaleString()} DA
+                </TableCell>
                 <TableCell>{getStatusBadge(order.status)}</TableCell>
                 <TableCell>{order.date}</TableCell>
-                <TableCell className="font-semibold">{order.total}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <button className="text-blue-600 hover:text-blue-800">

@@ -3,25 +3,41 @@ import React from 'react';
 import { Package, Users, DollarSign, TrendingUp } from 'lucide-react';
 
 const DashboardStats = () => {
+  // Mock data with costs and profits
+  const mockOrders = [
+    { product: 'Théière Traditionnelle Kabyle', price: 2500, cost: 1800, customer: 'Ahmed Benali' },
+    { product: 'Panier Artisanal Berbère', price: 1800, cost: 1200, customer: 'Fatima Khelifi' },
+    { product: 'Tapis Ghardaïa Authentique', price: 4200, cost: 3000, customer: 'Yacine Mourad' },
+    { product: 'Théière Traditionnelle Kabyle', price: 2500, cost: 1800, customer: 'Amina Sedki' },
+    { product: 'Panier Artisanal Berbère', price: 1800, cost: 1200, customer: 'Mohamed Larbi' }
+  ];
+
+  const totalRevenue = mockOrders.reduce((sum, order) => sum + order.price, 0);
+  const totalCosts = mockOrders.reduce((sum, order) => sum + order.cost, 0);
+  const totalProfit = totalRevenue - totalCosts;
+  const profitMargin = ((totalProfit / totalRevenue) * 100).toFixed(1);
+
+  const uniqueCustomers = [...new Set(mockOrders.map(order => order.customer))].length;
+
   const stats = [
     {
       name: 'Total Commandes',
-      value: '12',
+      value: mockOrders.length.toString(),
       change: '+2 cette semaine',
       changeType: 'positive',
       icon: Package,
     },
     {
-      name: 'Nouveaux Clients',
-      value: '8',
+      name: 'Clients Uniques',
+      value: uniqueCustomers.toString(),
       change: '+3 cette semaine',
       changeType: 'positive',
       icon: Users,
     },
     {
-      name: 'Revenus (DA)',
-      value: '24,500',
-      change: '+15% ce mois',
+      name: 'Bénéfices (DA)',
+      value: totalProfit.toLocaleString(),
+      change: `Marge: ${profitMargin}%`,
       changeType: 'positive',
       icon: DollarSign,
     },
